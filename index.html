@@ -857,11 +857,22 @@
   }, { threshold: 0.1 });
   reveals.forEach(el => observer.observe(el));
 
-  // FORM
+  // FORM → WHATSAPP
   function handleSubmit(e) {
     e.preventDefault();
+    const fields = e.target.querySelectorAll('input, textarea, select');
+    const nombre = fields[0].value;
+    const email = fields[1].value;
+    const marca = fields[2].value || 'No indicado';
+    const servicio = fields[3].value || 'No indicado';
+    const mensaje = fields[4].value || 'Sin mensaje';
+
+    const texto = `Hola, soy *${nombre}* 👋\n\n📧 Email: ${email}\n🏢 Marca: ${marca}\n🎯 Servicio: ${servicio}\n\n💬 ${mensaje}`;
+    const url = `https://wa.me/34609293571?text=${encodeURIComponent(texto)}`;
+
     e.target.style.display = 'none';
     document.getElementById('form-success').style.display = 'block';
+    setTimeout(() => window.open(url, '_blank'), 800);
   }
 
   // SMOOTH NAV

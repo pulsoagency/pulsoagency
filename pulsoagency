@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulso Agency — Marketing que late</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #F5F2EC;
+    --pulse: #FF3B00;
+    --pulse2: #FF9500;
+    --accent: #00E5FF;
+    --gray: #1A1A1A;
+    --gray2: #2C2C2C;
+    --text-muted: #888;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--pulse);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--pulse);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.18s ease, width 0.2s, height 0.2s, border-color 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring.hover {
+    width: 64px; height: 64px;
+    border-color: var(--accent);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 60px;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--pulse); }
+  .nav-cta {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid rgba(245,242,236,0.3);
+    padding: 10px 22px;
+    border-radius: 100px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .nav-cta:hover { background: var(--pulse); border-color: var(--pulse); color: var(--white); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(180px, 28vw, 380px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,59,0,0.1);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    animation: bgPulse 4s ease-in-out infinite;
+  }
+  @keyframes bgPulse {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pulse);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 12vw, 160px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.4s;
+  }
+  .hero-title .line2 { color: var(--pulse); }
+  .hero-title .line3 {
+    -webkit-text-stroke: 1px var(--white);
+    color: transparent;
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.7s;
+  }
+  .hero-desc {
+    max-width: 380px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+  .hero-desc strong { color: var(--white); font-weight: 400; }
+
+  .hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--pulse), transparent);
+    animation: scrollLine 1.5s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    background: var(--pulse);
+    padding: 18px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex;
+    animation: marquee 18s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    padding: 0 40px;
+    color: var(--black);
+  }
+  .marquee-dot { color: var(--black); opacity: 0.4; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTIONS COMMON */
+  section { padding: 120px 60px; }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--pulse);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-label::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--pulse);
+  }
+
+  /* SERVICIOS */
+  #servicios { background: var(--black); }
+  .servicios-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+  .servicios-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 0.95;
+  }
+  .servicios-title span { color: var(--pulse); }
+  .servicios-subtitle {
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  .servicios-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border: 1px solid var(--gray2);
+  }
+  .servicio-card {
+    padding: 40px 30px;
+    border-right: 1px solid var(--gray2);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    cursor: none;
+  }
+  .servicio-card:last-child { border-right: none; }
+  .servicio-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--pulse);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+    z-index: 0;
+  }
+  .servicio-card:hover::before { transform: translateY(0); }
+  .servicio-card > * { position: relative; z-index: 1; }
+  .servicio-num {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    transition: color 0.3s;
+  }
+  .servicio-card:hover .servicio-num { color: rgba(8,8,8,0.5); }
+  .servicio-icon {
+    font-size: 32px;
+    margin-bottom: 20px;
+    display: block;
+    filter: grayscale(1);
+    transition: filter 0.3s;
+  }
+  .servicio-card:hover .servicio-icon { filter: grayscale(0); }
+  .servicio-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    transition: color 0.3s;
+  }
+  .servicio-card:hover .servicio-name { color: var(--black); }
+  .servicio-desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    transition: color 0.3s;
+  }
+  .servicio-card:hover .servicio-desc { color: rgba(8,8,8,0.7); }
+
+  /* MANIFIESTO */
+  #manifiesto {
+    background: var(--white);
+    color: var(--black);
+    text-align: center;
+    padding: 140px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  #manifiesto::before {
+    content: '❤';
+    position: absolute;
+    font-size: 600px;
+    opacity: 0.04;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    pointer-events: none;
+    animation: heartbeat 2s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+  }
+  .manifiesto-label { color: var(--pulse); }
+  .manifiesto-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 6.5vw, 88px);
+    line-height: 1.05;
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .manifiesto-text .highlight {
+    color: var(--pulse);
+    display: inline-block;
+  }
+  .manifiesto-text .outline {
+    -webkit-text-stroke: 2px var(--black);
+    color: transparent;
+  }
+
+  /* PROCESO */
+  #proceso { background: var(--gray); }
+  .proceso-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 20px;
+  }
+  .proceso-step {
+    background: var(--black);
+    padding: 50px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .proceso-step:hover { background: #111; }
+  .proceso-num-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,59,0,0.2);
+    position: absolute;
+    right: 30px;
+    top: 20px;
+    pointer-events: none;
+    transition: -webkit-text-stroke-color 0.3s;
+  }
+  .proceso-step:hover .proceso-num-big { -webkit-text-stroke-color: rgba(255,59,0,0.5); }
+  .proceso-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pulse);
+    margin-bottom: 20px;
+  }
+  .proceso-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    margin-bottom: 16px;
+    line-height: 1;
+  }
+  .proceso-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 380px;
+  }
+
+  /* STATS */
+  #stats {
+    background: var(--black);
+    padding: 100px 60px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--gray2);
+    border-left: 1px solid var(--gray2);
+  }
+  .stat-item {
+    padding: 50px 40px;
+    border-right: 1px solid var(--gray2);
+    border-bottom: 1px solid var(--gray2);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--pulse), var(--pulse2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* CONTACTO */
+  #contacto {
+    background: var(--black);
+    padding: 120px 60px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-bg {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,59,0,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 130px);
+    line-height: 0.95;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 40px;
+  }
+  .contact-title span { color: var(--pulse); }
+  .contact-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+  }
+  .contact-sub strong { color: var(--white); font-weight: 400; }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 520px;
+    margin: 0 auto 60px;
+    position: relative;
+    z-index: 1;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select {
+    background: var(--gray);
+    border: 1px solid var(--gray2);
+    color: var(--white);
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    cursor: none;
+  }
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder { color: var(--text-muted); }
+  .contact-form input:focus,
+  .contact-form textarea:focus,
+  .contact-form select:focus { border-color: var(--pulse); }
+  .contact-form textarea { resize: none; height: 120px; }
+  .contact-form select option { background: var(--gray); }
+
+  .btn-primary {
+    background: var(--pulse);
+    color: var(--white);
+    border: none;
+    padding: 18px 48px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    border-radius: 4px;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover { transform: scale(1.02); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--gray2);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.05em;
+  }
+  .footer-logo span { color: var(--pulse); }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+  }
+  .footer-links a {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--pulse); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 24px 30px; }
+    section { padding: 80px 30px; }
+    #hero { padding: 0 30px 60px; }
+    .servicios-grid { grid-template-columns: 1fr 1fr; }
+    .servicio-card { border-right: 1px solid var(--gray2); border-bottom: 1px solid var(--gray2); }
+    .proceso-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .servicios-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .servicios-subtitle { text-align: left; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-bottom { flex-direction: column; align-items: flex-start; gap: 40px; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+
+  /* REVEAL ANIMATION */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">PULSO<span>.</span></a>
+  <a href="#contacto" class="nav-cta">Hablemos</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">PULSO</div>
+  <div class="hero-tag">Agencia de Marketing Digital — España</div>
+  <h1 class="hero-title">
+    <span class="line1">Tu marca</span><br>
+    <span class="line2">necesita</span><br>
+    <span class="line3">latir.</span>
+  </h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      Estrategia, contenido y publicidad para marcas que quieren <strong>crecer de verdad</strong>. Sin humo. Sin promesas vacías. Solo resultados.
+    </p>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Estrategia de Contenidos</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Gestión de Redes Sociales</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Publicidad Digital</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Branding y Posicionamiento</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Consultoría de Marketing</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Estrategia de Contenidos</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Gestión de Redes Sociales</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Publicidad Digital</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Branding y Posicionamiento</span>
+    <span class="marquee-item marquee-dot">✦</span>
+    <span class="marquee-item">Consultoría de Marketing</span>
+    <span class="marquee-item marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="section-label">Lo que hacemos</div>
+  <div class="servicios-header reveal">
+    <h2 class="servicios-title">Nuestros<br><span>Servicios</span></h2>
+    <p class="servicios-subtitle">Cada servicio está diseñado para trabajar solo o en conjunto. Tu marca, tu ritmo.</p>
+  </div>
+  <div class="servicios-grid reveal">
+    <div class="servicio-card">
+      <div class="servicio-num">01</div>
+      <span class="servicio-icon">📱</span>
+      <div class="servicio-name">Redes Sociales</div>
+      <p class="servicio-desc">Gestión completa de Instagram, TikTok y LinkedIn. Contenido que convierte, no solo que gusta.</p>
+    </div>
+    <div class="servicio-card">
+      <div class="servicio-num">02</div>
+      <span class="servicio-icon">✍️</span>
+      <div class="servicio-name">Estrategia de Contenidos</div>
+      <p class="servicio-desc">Calendarios editoriales, pilares de marca y storytelling que posiciona tu negocio como referente.</p>
+    </div>
+    <div class="servicio-card">
+      <div class="servicio-num">03</div>
+      <span class="servicio-icon">🎯</span>
+      <div class="servicio-name">Publicidad Digital</div>
+      <p class="servicio-desc">Campañas en Meta Ads y Google Ads optimizadas para maximizar tu retorno de inversión.</p>
+    </div>
+    <div class="servicio-card">
+      <div class="servicio-num">04</div>
+      <span class="servicio-icon">🔥</span>
+      <div class="servicio-name">Branding</div>
+      <p class="servicio-desc">Identidad visual, voz de marca y posicionamiento estratégico para que te recuerden.</p>
+    </div>
+    <div class="servicio-card">
+      <div class="servicio-num">05</div>
+      <span class="servicio-icon">🧠</span>
+      <div class="servicio-name">Consultoría</div>
+      <p class="servicio-desc">Auditoría completa de tu marketing actual y hoja de ruta para los próximos 90 días.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFIESTO -->
+<section id="manifiesto">
+  <div class="section-label manifiesto-label">Nuestra filosofía</div>
+  <p class="manifiesto-text reveal">
+    El marketing que <span class="highlight">no se siente</span>,<br>
+    no se <span class="outline">recuerda</span>.<br>
+    Y lo que no se recuerda,<br>
+    <span class="highlight">no vende.</span>
+  </p>
+</section>
+
+<!-- PROCESO -->
+<section id="proceso">
+  <div class="section-label">Cómo trabajamos</div>
+  <div class="proceso-grid">
+    <div class="proceso-step reveal">
+      <div class="proceso-num-big">01</div>
+      <div class="proceso-tag">Fase 1</div>
+      <div class="proceso-name">Diagnóstico</div>
+      <p class="proceso-desc">Analizamos tu marca, tu competencia y tu audiencia. Sin datos reales no hay estrategia real.</p>
+    </div>
+    <div class="proceso-step reveal">
+      <div class="proceso-num-big">02</div>
+      <div class="proceso-tag">Fase 2</div>
+      <div class="proceso-name">Estrategia</div>
+      <p class="proceso-desc">Diseñamos un plan a medida con objetivos claros, KPIs definidos y un calendario de acción.</p>
+    </div>
+    <div class="proceso-step reveal">
+      <div class="proceso-num-big">03</div>
+      <div class="proceso-tag">Fase 3</div>
+      <div class="proceso-name">Ejecución</div>
+      <p class="proceso-desc">Creamos, publicamos y gestionamos todo. Tú te centras en tu negocio. Nosotros en hacer que crezca.</p>
+    </div>
+    <div class="proceso-step reveal">
+      <div class="proceso-num-big">04</div>
+      <div class="proceso-tag">Fase 4</div>
+      <div class="proceso-name">Optimización</div>
+      <p class="proceso-desc">Medimos, ajustamos y mejoramos cada semana. El marketing que no evoluciona, muere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="section-label reveal">Resultados que hablan</div>
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <div class="stat-num">+340%</div>
+      <div class="stat-label">Crecimiento medio de alcance orgánico en 90 días</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">3.8x</div>
+      <div class="stat-label">Retorno medio de inversión en campañas de paid media</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">50+</div>
+      <div class="stat-label">Marcas acompañadas en su crecimiento digital</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Estrategia personalizada. Sin plantillas. Sin copy-paste.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="contact-bg"></div>
+  <div class="section-label" style="justify-content:center">Empecemos</div>
+  <h2 class="contact-title reveal">¿Tu marca<br>está lista para<br><span>latir?</span></h2>
+  <p class="contact-sub reveal">Primera consulta <strong>gratuita</strong>. Sin compromiso. Sin humo.</p>
+  <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+    <div class="form-row">
+      <input type="text" id="f-nombre" placeholder="Tu nombre" required>
+      <input type="email" id="f-email" placeholder="Tu email" required>
+    </div>
+    <input type="text" id="f-marca" placeholder="Nombre de tu marca o empresa">
+    <select id="f-servicio">
+      <option value="" disabled selected>¿Qué necesitas?</option>
+      <option>Gestión de Redes Sociales</option>
+      <option>Estrategia de Contenidos</option>
+      <option>Publicidad Digital (Ads)</option>
+      <option>Branding y Posicionamiento</option>
+      <option>Consultoría de Marketing</option>
+      <option>Todo lo anterior</option>
+    </select>
+    <textarea id="f-mensaje" placeholder="Cuéntanos brevemente dónde está tu marca ahora mismo y adónde quieres llevarla..."></textarea>
+    <button type="submit" class="btn-primary">Quiero que mi marca lata →</button>
+  </form>
+  <div id="form-success" style="display:none;color:var(--pulse);font-family:'Bebas Neue',sans-serif;font-size:28px;position:relative;z-index:1">
+    ✦ Abriendo tu gestor de email... completa el envío desde ahí.
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PULSO<span>.</span></div>
+  <div class="footer-copy">© 2025 Pulso Agency — Todos los derechos reservados</div>
+  <div class="footer-links">
+    <a href="#servicios">Servicios</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+</footer>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .servicio-card, .proceso-step').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+
+  // REVEAL ON SCROLL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // FORM
+  function handleSubmit(e) {
+    e.preventDefault();
+    e.target.style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }
+
+  // SMOOTH NAV
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
